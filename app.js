@@ -1,0 +1,114 @@
+const express = require("express");
+const bodyParser = require("body-parser");
+const cors = require("cors"); // <== Import cors
+
+const app = express();
+const port = 8000;
+
+app.use(cors());
+// Middleware
+app.use(bodyParser.json()); // Parse JSON bodies
+
+// In-memory mock product data
+let products = [
+  {
+    id: 1,
+    name: "iPhone 16 Pro",
+    price: 999.99,
+    inStock: true,
+    image:
+      "data:image/jpeg;base64,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",
+  },
+
+  {
+    id: 2,
+    name: "Galaxy S25 Ultra",
+    price: 899.99,
+    inStock: false,
+    image:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRPYrQiAgPie7lN2VFfeVfGrRAP48ZR5oE0CBaEE6Q2PdZ9MRr-yWoBW--tOqcm-jlzC9o&usqp=CAU",
+  },
+  {
+    id: 3,
+    name: "Pixel 7",
+    price: 799.99,
+    inStock: true,
+    image:
+      "data:image/jpeg;base64,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",
+  },
+  {
+    id: 4,
+    name: "Galaxy S24 Ultra",
+    price: 899.99,
+    inStock: false,
+    image:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRPYrQiAgPie7lN2VFfeVfGrRAP48ZR5oE0CBaEE6Q2PdZ9MRr-yWoBW--tOqcm-jlzC9o&usqp=CAU",
+  },
+  {
+    id: 5,
+    name: "Galaxy S23 Ultra",
+    price: 899.99,
+    inStock: false,
+    image:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRPYrQiAgPie7lN2VFfeVfGrRAP48ZR5oE0CBaEE6Q2PdZ9MRr-yWoBW--tOqcm-jlzC9o&usqp=CAU",
+  },
+];
+
+// Routes
+app.get("/api/products", (req, res) => {
+  const data = products;
+  res.status(201).json(data);
+});
+
+// GET single product by ID
+app.get("/api/products/:id", (req, res) => {
+  const product = products.find((p) => p.id === parseInt(req.params.id));
+  if (!product) return res.status(404).json({ message: "Product not found" });
+  res.json(product);
+});
+
+// POST (create) new product
+app.post("/api/products", (req, res) => {
+  const { name, price, inStock } = req.body;
+  const newProduct = {
+    id: products.length + 1,
+    name,
+    price,
+    inStock,
+  };
+  products.push(newProduct);
+  res.status(201).json(newProduct);
+});
+
+// PUT (update) existing product
+app.put("/api/products/:id", (req, res) => {
+  const { name, price, inStock } = req.body;
+  const product = products.find((p) => p.id === parseInt(req.params.id));
+  if (!product) return res.status(404).json({ message: "Product not found" });
+
+  product.name = name ?? product.name;
+  product.price = price ?? product.price;
+  product.inStock = inStock ?? product.inStock;
+
+  res.json(product);
+});
+
+// DELETE product
+app.delete("/api/products/:id", (req, res) => {
+  const index = products.findIndex((p) => p.id === parseInt(req.params.id));
+  if (index === -1)
+    return res.status(404).json({ message: "Product not found" });
+
+  const deleted = products.splice(index, 1);
+  res.json(deleted[0]);
+});
+
+// Root
+app.get("/", (req, res) => {
+  res.send("Welcome to the Product API");
+});
+
+// Start server
+app.listen(port, () => {
+  console.log(`Server is running at http://localhost:${port}`);
+});
